@@ -7,8 +7,7 @@ const imgbbUploader = require("imgbb-uploader");
 
 
 admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    //  collection url 
+    credential: admin.credential.cert(serviceAccount), 
     databaseURL: "https://websitedata-9cdbf-default-rtdb.firebaseio.com/"
 });
 
@@ -66,3 +65,5 @@ app.post('/upload', async (req, res) => {
 app.listen(5000, () => {
     console.log('Server listening on port 5000.');
 });
+
+
