@@ -4,6 +4,7 @@
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "firebase": "^9.17.2",
+    "formidable": "^2.1.1",
     "fs": "^0.0.1-security",
     "imgbb-uploader": "^1.5.0",
     "mongoose": "^6.8.4",
