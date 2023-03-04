@@ -23,47 +23,58 @@ app.post('/upload', async (req, res) => {
             return;
         }
 
-        let { name, email } = fields;
+        let { name, email, companyName, linkedinUrl, batchYear,url } = fields;
+
+        console.log("email20",email)
         const file = files.photo;
         let response = {}
-        // try {
-        //     response = await imgbbUploader("cbd44dd9b4da93cee7cea6b1c15ada92", file.filepath)
-        // } catch (error) {
-        //     console.log("error", error)
-        // }
+        try {
+            response = await imgbbUploader("cbd44dd9b4da93cee7cea6b1c15ada92", file.filepath)
+        } catch (error) {
+            console.log("error", error)
+        }
 
-        email = email.replace(/[^\w\s]/gi, '')
+    const emailId = email ? email.replace(/[^\w\s]/gi, '') : ''
 
         console.log("name", name)
         console.log("email", email)
         console.log("files", file.filepath)
 
-        const formDataRef = db.ref(`form_data/${email}`);
+        const formDataRef = db.ref(`form_data/${emailId}`);
 
         const formData = {
-            name: 'John Doe',
-            email: 'johndoe@example.com',
-            link: 'https://www.zunpulse.com'
+          name: name,
+          email:email,
+          companyName: companyName,
+          imageUrl: response.url || "",
+          linkedinUrl: url,
+          batchYear: batchYear,
+          updated: Date.now(),
+          approve: false,
+          reject: false,
         };
 
-        formDataRef.set(formData)
-            .then(() => {
-                console.log('Form data saved successfully.');
-            })
-            .catch((error) => {
-                console.error('Error saving form data:', error);
-            });
+        formDataRef
+          .set(formData)
+          .then(() => {
+            console.log("Form data saved successfully.");
+          })
+          .catch((error) => {
+            console.error("Error saving form data:", error);
+            res.send({ message: "bad request" });
+          });
 
 
-        res.send({ message: 'success'})
+        res.send({ message: 'success', data:response})
         return
 
         res.send('File uploaded successfully.');
     });
 });
 
-app.listen(5000, () => {
-    console.log('Server listening on port 5000.');
+
+app.listen(6000, () => {
+    console.log('Server listening on port 6000.');
 });
 
 
