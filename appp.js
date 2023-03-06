@@ -116,27 +116,34 @@ app.get('/editPrivatePageData',async(req,res)=>{
   }
   const ref = db.ref("form_data");
 
-  if(req.body.approve){
+  console.log("approvedData",req.body.approve)
+  if(req.body.approve===true){
 
     ref.child(key).on("value", function (snapshot) {
       console.log("getPrviateData115", snapshot.val());
-      // return res.send({ data: snapshot.val() });
 
       if (!snapshot.val()) {
         return;
       }
 
-      // Assume that you have already initialized Firebase and obtained a reference to your database
-      const databaseRef =db.ref("form_data"+key);
+      const databaseRef =db.ref("form_data/"+key);
 
       // Update data at a specific node
       databaseRef
         .update({
-          name: "varun",
-          batchYear:2022
+          name: snapshot.val().name,
+          batchYear: snapshot.val().batchYear || 2019,
+          companyName: snapshot.val().companyName || "",
+          linkedinUrl: snapshot.val().linkedinUrl || "",
+          email: snapshot.val().email || "",
+          approve: true,
+          reject: false,
+          updated: Date.now(),
+          imageUrl: snapshot.val().imageUrl || "",
         })
         .then(() => {
           console.log("Data updated successfully!");
+          return res.send({ message: "Data updated successfully"});
         })
         .catch((error) => {
           console.error("Error updating data:", error);
@@ -145,6 +152,34 @@ app.get('/editPrivatePageData',async(req,res)=>{
     });
 
   }
+  else{
+
+    ref.child(key).on("value", function (snapshot) {
+      console.log("getPrviateData115", snapshot.val());
+
+      if (!snapshot.val()) {
+        return;
+      }
+
+      const databaseRef = db.ref("form_data/" + key);
+
+      databaseRef
+        .update({
+          approve: false,
+          reject: true,
+          updated: Date.now(),
+        })
+        .then(() => {
+          console.log("Data updated successfully!");
+          return res.send({ message: "Data Rejected updated successfully" });
+        })
+        .catch((error) => {
+          console.error("Error updating data:", error);
+        });
+
+    });
+        
+   }
 
  
 

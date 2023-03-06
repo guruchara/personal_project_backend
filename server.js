@@ -234,21 +234,6 @@ app.post('/editPrivate', async (req, res) => {
         check.reject = true
 
         let response = await check.save()
-        // no need to save this data in  our main db 
-        // distinct and approved data 
-        // const userDataObj = new UserDetails({
-        //     name: check.name,
-        //     email: check.email,
-        //     companyName: check.companyName,
-        //     linkedinUrl: check.linkedinUrl,
-        //     batchYear: check.batchYear,
-        //     imageUrl: check.imageUrl,
-        //     updated: Date.now(),
-        //     approve: false,
-        //     reject:true
-        // })
-
-        // let resss = await userDataObj.save()
     }
 
     UserDetails.find({}, function (err, datas) {
