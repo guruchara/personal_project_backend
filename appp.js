@@ -109,6 +109,7 @@ app.get("/getData", async (req, res) => {
 });
 
 //  edit private page data like approve reject
+
 app.post("/editPrivatePageData", async (req, res) => {
   const { approve, reject, email } = req.body;
 
@@ -117,23 +118,21 @@ app.post("/editPrivatePageData", async (req, res) => {
   if (!key) {
     return res.send("bad Request mail not found");
   }
-  const ref = db.ref("form_data");
 
+  const ref = db.ref("form_data");
   console.log("approvedData", req.body.approve);
 
-  if (req.body.approve === "true") {
-    console.log("inside if");
-    ref.child(key).on("value", function (snapshot) {
-      console.log("getPrviateData115", snapshot.val());
+  ref.child(key).on("value", function (snapshot) {
+    console.log("getPrviateData115", snapshot.val());
 
-      if (!snapshot.val()) {
-        return;
-      }
+    if (!snapshot.val()) {
+      return;
+    }
 
-      const backRes = snapshot.val();
-      const databaseRef = db.ref("form_data/" + key);
+    const databaseRef = db.ref("form_data/" + key);
+    const backRes = snapshot.val();
 
-      // Update data at a specific node
+    if (req.body.approve === "true") {
       databaseRef
         .update({
           name: backRes.name,
@@ -154,16 +153,9 @@ app.post("/editPrivatePageData", async (req, res) => {
         .catch((error) => {
           console.error("Error updating data:", error);
         });
-    });
-  } else {
-    console.log("inside else");
-    ref.child(key).on("value", function (snapshot) {
-      if (!snapshot.val()) {
-        return;
-      }
-
-      const databaseRef = db.ref("form_data/" + key);
-
+    }
+     else {
+      
       databaseRef
         .update({
           approve: false,
@@ -177,8 +169,8 @@ app.post("/editPrivatePageData", async (req, res) => {
         .catch((error) => {
           console.error("Error updating data:", error);
         });
-    });
-  }
+    }
+  });
 });
 
 // get all card data on home students who already placed this send only filtering data
