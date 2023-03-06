@@ -48,11 +48,6 @@ app.post("/upload", async (req, res) => {
     }
 
     const emailId = email ? email.replace(/[^\w\s]/gi, "") : "";
-
-    console.log("name", name);
-    console.log("email", email);
-    console.log("files", file.filepath);
-
     const formDataRef = db.ref(`form_data/${emailId}`);
 
     const formData = {
@@ -120,7 +115,6 @@ app.post("/editPrivatePageData", async (req, res) => {
   }
 
   const ref = db.ref("form_data");
-  console.log("approvedData", req.body.approve);
 
   ref.child(key).on("value", function (snapshot) {
     console.log("getPrviateData115", snapshot.val());
