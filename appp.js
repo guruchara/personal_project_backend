@@ -4,7 +4,7 @@ const app = express();
 var admin = require("firebase-admin");
 var serviceAccount = require("./prod.json");
 const imgbbUploader = require("imgbb-uploader");
-const bodyParser=require('body-parser')
+const bodyParser = require("body-parser");
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -12,9 +12,10 @@ admin.initializeApp({
 });
 
 const db = admin.database();
-app.use(bodyParser.json()) // for parsing application/json
+app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// set add user data in firebase
 app.post("/upload", async (req, res) => {
   const form = formidable({ multiples: true });
 
@@ -68,7 +69,7 @@ app.post("/upload", async (req, res) => {
         console.error("Error saving form data:", error);
         res.send({ message: "bad request" });
       });
-      
+
     res.send({ message: "success", data: response });
     return;
 
@@ -76,20 +77,82 @@ app.post("/upload", async (req, res) => {
   });
 });
 
-app.get("/getData", async (req, res) => {
 
+// get all private page data from firebase 
+app.get('/getPrivatePageData',async(req,res)=>{
+
+  const ref = db.ref("form_data");
+  ref.once('value').then((snapshot) => {
+    const data = snapshot.val();
+    console.log("getAllData",data);
+    return res.send({ans:data})
+  });
+
+})
+
+
+// get specifiec node data from firebase database 
+app.get("/getData", async (req, res) => {
   const { approve, reject, email } = req.body;
 
-  console.log("bodyData",req.body)
+  console.log("bodyData", req.body);
   const key = email ? email.replace(/[^\w\s]/gi, "") : "";
 
-  const ref = db.ref("form_data/" + key);
-  ref.once("value", (snapshot) => {
-    const data = snapshot.val();
-    console.log(data);
-    res.send({result:data})
+  const ref = db.ref("form_data");
+  ref.child(key).on("value", function (snapshot) {
+    console.log("value", snapshot.val());
+    return res.send({ data: snapshot.val() });
   });
 });
+
+//  edit private page data like approve reject 
+app.get('/editPrivatePageData',async(req,res)=>{
+  const { approve, reject, email } = req.body;
+
+  const key = email ? email.replace(/[^\w\s]/gi, "") : "";
+
+  if(!key){
+    return res.send("bad Request mail not found")
+  }
+  const ref = db.ref("form_data");
+
+  if(req.body.approve){
+
+    ref.child(key).on("value", function (snapshot) {
+      console.log("getPrviateData115", snapshot.val());
+      // return res.send({ data: snapshot.val() });
+
+      if (!snapshot.val()) {
+        return;
+      }
+
+      // Assume that you have already initialized Firebase and obtained a reference to your database
+      const databaseRef =db.ref("form_data"+key);
+
+      // Update data at a specific node
+      databaseRef
+        .update({
+          name: "varun",
+          batchYear:2022
+        })
+        .then(() => {
+          console.log("Data updated successfully!");
+        })
+        .catch((error) => {
+          console.error("Error updating data:", error);
+        });
+
+    });
+
+  }
+
+ 
+
+
+
+   
+   
+})
 
 app.listen(6000, () => {
   console.log("Server listening on port 6000.");
