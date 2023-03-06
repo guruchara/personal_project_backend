@@ -2,13 +2,20 @@ const formidable = require("formidable");
 const express = require("express");
 const app = express();
 var admin = require("firebase-admin");
+
 var serviceAccount = require("./prod.json");
+
+// guru prod db json personal accout
+// var serviceAccount = require("./guruProd.json");
 const imgbbUploader = require("imgbb-uploader");
 const bodyParser = require("body-parser");
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: "https://websitedata-9cdbf-default-rtdb.firebaseio.com/",
+
+  //guru prod db url
+  // databaseURL:"https://websiteguru-5ab2b-default-rtdb.firebaseio.com/"
 });
 
 const db = admin.database();
@@ -114,9 +121,8 @@ app.post("/editPrivatePageData", async (req, res) => {
 
   console.log("approvedData", req.body.approve);
 
-  if (req.body.approve === 'true') {
-
-    console.log("inside if")
+  if (req.body.approve === "true") {
+    console.log("inside if");
     ref.child(key).on("value", function (snapshot) {
       console.log("getPrviateData115", snapshot.val());
 
@@ -124,16 +130,16 @@ app.post("/editPrivatePageData", async (req, res) => {
         return;
       }
 
-      const backRes=snapshot.val()
+      const backRes = snapshot.val();
       const databaseRef = db.ref("form_data/" + key);
 
       // Update data at a specific node
       databaseRef
         .update({
           name: backRes.name,
-          batchYear:backRes.batchYear || 2019,
-          companyName:backRes.companyName || "",
-          linkedinUrl:backRes.linkedinUrl || "",
+          batchYear: backRes.batchYear || 2019,
+          companyName: backRes.companyName || "",
+          linkedinUrl: backRes.linkedinUrl || "",
           email: backRes.email || "",
           approve: true,
           reject: false,
@@ -142,26 +148,24 @@ app.post("/editPrivatePageData", async (req, res) => {
         })
         .then(() => {
           console.log("Data updated successfully!");
-           res.send({ message: "Data updated successfully" });
-           return
+          res.send({ message: "Data updated successfully" });
+          return;
         })
         .catch((error) => {
           console.error("Error updating data:", error);
         });
     });
-  } 
-  else {
-
-    console.log("inside else")
+  } else {
+    console.log("inside else");
     ref.child(key).on("value", function (snapshot) {
-
       if (!snapshot.val()) {
         return;
       }
 
       const databaseRef = db.ref("form_data/" + key);
 
-      databaseRef.update({
+      databaseRef
+        .update({
           approve: false,
           reject: true,
           updated: Date.now(),
@@ -176,7 +180,6 @@ app.post("/editPrivatePageData", async (req, res) => {
     });
   }
 });
-
 
 // get all card data on home students who already placed this send only filtering data
 
@@ -201,9 +204,8 @@ app.get("/allCardsData", async (req, res) => {
   });
 });
 
-// add career job information 
+// add career job information
 app.post("/addCareer", async (req, res) => {
-
   const form = formidable({ multiples: true });
 
   form.parse(req, async (err, fields, files) => {
@@ -213,7 +215,7 @@ app.post("/addCareer", async (req, res) => {
       return;
     }
 
-    let { email, link,companyName} = fields;
+    let { email, link, companyName } = fields;
 
     console.log("email20", email);
     const file = files.photo;
@@ -227,42 +229,39 @@ app.post("/addCareer", async (req, res) => {
       console.log("error", error);
     }
 
-  const emailId = email ? email.replace(/[^\w\s]/gi, "") : "";
+    const emailId = email ? email.replace(/[^\w\s]/gi, "") : "";
 
-  const careerDataRef = db.ref(`career_data/${emailId}`);
-  // return res.send({message:'yaa'})
-  const careerData = {
-    companyName: companyName|| "",
-    jobUrl: link || "",
-    email: email || "",
-    imageUrl:response.url || ""
-  };
+    const careerDataRef = db.ref(`career_data/${emailId}`);
+    // return res.send({message:'yaa'})
+    const careerData = {
+      companyName: companyName || "",
+      jobUrl: link || "",
+      email: email || "",
+      imageUrl: response.url || "",
+    };
 
-  careerDataRef
-    .set(careerData)
-    .then(() => {
-      console.log("Form data saved successfully.");
-      return res.send({message:'career data uploaded successfully'})
-    })
-    .catch((error) => {
-      console.error("Error saving form data:", error);
-      res.send({ message: "bad request" });
-    });
+    careerDataRef
+      .set(careerData)
+      .then(() => {
+        console.log("Form data saved successfully.");
+        return res.send({ message: "career data uploaded successfully" });
+      })
+      .catch((error) => {
+        console.error("Error saving form data:", error);
+        res.send({ message: "bad request" });
+      });
+  });
 });
 
-})
-
 // get career data from carerr_data firebase database
-app.get('/getCareerData',async(req,res)=>{
-
+app.get("/getCareerData", async (req, res) => {
   const ref = db.ref("career_data");
   ref.once("value").then((snapshot) => {
     const data = snapshot.val();
     console.log("CareerData", data);
     return res.send({ ans: data });
   });
-     
-})
+});
 
 app.listen(6000, () => {
   console.log("Server listening on port 6000.");
