@@ -85,7 +85,15 @@ app.get("/getPrivatePageData", async (req, res) => {
   ref.once("value").then((snapshot) => {
     const data = snapshot.val();
     console.log("getAllData", data);
-    return res.send({ ans: data });
+
+    let privateDataArr=[]
+    
+    for(let key in data){
+       if(data[key]){
+           privateDataArr.push(data[key])
+       }
+    }
+    return res.send({ ans:privateDataArr });
   });
 });
 
@@ -245,7 +253,14 @@ app.get("/getCareerData", async (req, res) => {
   ref.once("value").then((snapshot) => {
     const data = snapshot.val();
     console.log("CareerData", data);
-    return res.send({ ans: data });
+    let responseArr=[]
+    
+    for(let key in data){
+       if(data[key]){
+           responseArr.push(data[key])
+       }
+    }
+    return res.send({ ans: responseArr });
   });
 });
 
