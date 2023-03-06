@@ -171,6 +171,9 @@ app.get("/editPrivatePageData", async (req, res) => {
   }
 });
 
+
+// get all card data on home students who already placed this send only filtering data
+
 app.get("/allCardsData", async (req, res) => {
   const ref = db.ref("form_data");
 
@@ -192,6 +195,7 @@ app.get("/allCardsData", async (req, res) => {
   });
 });
 
+// add career job information 
 app.post("/addCareer", async (req, res) => {
 
   const form = formidable({ multiples: true });
@@ -240,6 +244,18 @@ app.post("/addCareer", async (req, res) => {
     });
 });
 
+})
+
+// get career data from carerr_data firebase database
+app.get('/getCareerData',async(req,res)=>{
+
+  const ref = db.ref("career_data");
+  ref.once("value").then((snapshot) => {
+    const data = snapshot.val();
+    console.log("CareerData", data);
+    return res.send({ ans: data });
+  });
+     
 })
 
 app.listen(6000, () => {
