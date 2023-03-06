@@ -77,21 +77,17 @@ app.post("/upload", async (req, res) => {
   });
 });
 
-
-// get all private page data from firebase 
-app.get('/getPrivatePageData',async(req,res)=>{
-
+// get all private page data from firebase
+app.get("/getPrivatePageData", async (req, res) => {
   const ref = db.ref("form_data");
-  ref.once('value').then((snapshot) => {
+  ref.once("value").then((snapshot) => {
     const data = snapshot.val();
-    console.log("getAllData",data);
-    return res.send({ans:data})
+    console.log("getAllData", data);
+    return res.send({ ans: data });
   });
+});
 
-})
-
-
-// get specifiec node data from firebase database 
+// get specifiec node data from firebase database
 app.get("/getData", async (req, res) => {
   const { approve, reject, email } = req.body;
 
@@ -105,20 +101,19 @@ app.get("/getData", async (req, res) => {
   });
 });
 
-//  edit private page data like approve reject 
-app.get('/editPrivatePageData',async(req,res)=>{
+//  edit private page data like approve reject
+app.get("/editPrivatePageData", async (req, res) => {
   const { approve, reject, email } = req.body;
 
   const key = email ? email.replace(/[^\w\s]/gi, "") : "";
 
-  if(!key){
-    return res.send("bad Request mail not found")
+  if (!key) {
+    return res.send("bad Request mail not found");
   }
   const ref = db.ref("form_data");
 
-  console.log("approvedData",req.body.approve)
-  if(req.body.approve===true){
-
+  console.log("approvedData", req.body.approve);
+  if (req.body.approve === true) {
     ref.child(key).on("value", function (snapshot) {
       console.log("getPrviateData115", snapshot.val());
 
@@ -126,7 +121,7 @@ app.get('/editPrivatePageData',async(req,res)=>{
         return;
       }
 
-      const databaseRef =db.ref("form_data/"+key);
+      const databaseRef = db.ref("form_data/" + key);
 
       // Update data at a specific node
       databaseRef
@@ -143,17 +138,13 @@ app.get('/editPrivatePageData',async(req,res)=>{
         })
         .then(() => {
           console.log("Data updated successfully!");
-          return res.send({ message: "Data updated successfully"});
+          return res.send({ message: "Data updated successfully" });
         })
         .catch((error) => {
           console.error("Error updating data:", error);
         });
-
     });
-
-  }
-  else{
-
+  } else {
     ref.child(key).on("value", function (snapshot) {
       console.log("getPrviateData115", snapshot.val());
 
@@ -176,18 +167,30 @@ app.get('/editPrivatePageData',async(req,res)=>{
         .catch((error) => {
           console.error("Error updating data:", error);
         });
-
     });
-        
-   }
+  }
+});
 
- 
+app.get("/allCardsData", async (req, res) => {
+  const ref = db.ref("form_data");
 
+  ref.once("value").then((snapshot) => {
+    const data = snapshot.val();
+    console.log("allData191", data);
+    let arr = [];
 
+    console.log("arr", arr);
 
-   
-   
-})
+    for (let key in data) {
+      if (data[key].approve === true) {
+        console.log("object", data[key]);
+        arr.push(data[key]);
+      }
+    }
+
+    return res.send({ ans: arr });
+  });
+});
 
 app.listen(6000, () => {
   console.log("Server listening on port 6000.");
