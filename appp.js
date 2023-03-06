@@ -192,6 +192,56 @@ app.get("/allCardsData", async (req, res) => {
   });
 });
 
+app.post("/addCareer", async (req, res) => {
+
+  const form = formidable({ multiples: true });
+
+  form.parse(req, async (err, fields, files) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send("Error parsing form data.");
+      return;
+    }
+
+    let { email, link,companyName} = fields;
+
+    console.log("email20", email);
+    const file = files.photo;
+    let response = {};
+    try {
+      response = await imgbbUploader(
+        "cbd44dd9b4da93cee7cea6b1c15ada92",
+        file.filepath
+      );
+    } catch (error) {
+      console.log("error", error);
+    }
+
+  const emailId = email ? email.replace(/[^\w\s]/gi, "") : "";
+
+  const careerDataRef = db.ref(`career_data/${emailId}`);
+  // return res.send({message:'yaa'})
+  const careerData = {
+    companyName: companyName|| "",
+    jobUrl: link || "",
+    email: email || "",
+    imageUrl:response.url || ""
+  };
+
+  careerDataRef
+    .set(careerData)
+    .then(() => {
+      console.log("Form data saved successfully.");
+      return res.send({message:'career data uploaded successfully'})
+    })
+    .catch((error) => {
+      console.error("Error saving form data:", error);
+      res.send({ message: "bad request" });
+    });
+});
+
+})
+
 app.listen(6000, () => {
   console.log("Server listening on port 6000.");
 });
