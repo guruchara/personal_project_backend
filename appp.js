@@ -102,7 +102,7 @@ app.get("/getData", async (req, res) => {
 });
 
 //  edit private page data like approve reject
-app.get("/editPrivatePageData", async (req, res) => {
+app.post("/editPrivatePageData", async (req, res) => {
   const { approve, reject, email } = req.body;
 
   const key = email ? email.replace(/[^\w\s]/gi, "") : "";
@@ -113,7 +113,10 @@ app.get("/editPrivatePageData", async (req, res) => {
   const ref = db.ref("form_data");
 
   console.log("approvedData", req.body.approve);
-  if (req.body.approve === true) {
+
+  if (req.body.approve === 'true') {
+
+    console.log("inside if")
     ref.child(key).on("value", function (snapshot) {
       console.log("getPrviateData115", snapshot.val());
 
@@ -121,32 +124,36 @@ app.get("/editPrivatePageData", async (req, res) => {
         return;
       }
 
+      const backRes=snapshot.val()
       const databaseRef = db.ref("form_data/" + key);
 
       // Update data at a specific node
       databaseRef
         .update({
-          name: snapshot.val().name,
-          batchYear: snapshot.val().batchYear || 2019,
-          companyName: snapshot.val().companyName || "",
-          linkedinUrl: snapshot.val().linkedinUrl || "",
-          email: snapshot.val().email || "",
+          name: backRes.name,
+          batchYear:backRes.batchYear || 2019,
+          companyName:backRes.companyName || "",
+          linkedinUrl:backRes.linkedinUrl || "",
+          email: backRes.email || "",
           approve: true,
           reject: false,
           updated: Date.now(),
-          imageUrl: snapshot.val().imageUrl || "",
+          imageUrl: backRes.imageUrl || "",
         })
         .then(() => {
           console.log("Data updated successfully!");
-          return res.send({ message: "Data updated successfully" });
+           res.send({ message: "Data updated successfully" });
+           return
         })
         .catch((error) => {
           console.error("Error updating data:", error);
         });
     });
-  } else {
+  } 
+  else {
+
+    console.log("inside else")
     ref.child(key).on("value", function (snapshot) {
-      console.log("getPrviateData115", snapshot.val());
 
       if (!snapshot.val()) {
         return;
@@ -154,14 +161,13 @@ app.get("/editPrivatePageData", async (req, res) => {
 
       const databaseRef = db.ref("form_data/" + key);
 
-      databaseRef
-        .update({
+      databaseRef.update({
           approve: false,
           reject: true,
           updated: Date.now(),
         })
         .then(() => {
-          console.log("Data updated successfully!");
+          console.log("reject failed!");
           return res.send({ message: "Data Rejected updated successfully" });
         })
         .catch((error) => {
