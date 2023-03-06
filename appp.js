@@ -1,9 +1,11 @@
 const formidable = require("formidable");
+const cors = require('cors')
 const express = require("express");
 const app = express();
 var admin = require("firebase-admin");
 
 var serviceAccount = require("./prod.json");
+app.use(cors());
 
 // guru prod db json personal accout
 // var serviceAccount = require("./guruProd.json");
@@ -79,8 +81,9 @@ app.post("/upload", async (req, res) => {
   });
 });
 
-// get all private page data from firebase
+// get all data of private page  from firebase
 app.get("/getPrivatePageData", async (req, res) => {
+  console.log('get api call');
   const ref = db.ref("form_data");
   ref.once("value").then((snapshot) => {
     const data = snapshot.val();
@@ -264,6 +267,6 @@ app.get("/getCareerData", async (req, res) => {
   });
 });
 
-app.listen(6000, () => {
+app.listen(4040, () => {
   console.log("Server listening on port 6000.");
 });
