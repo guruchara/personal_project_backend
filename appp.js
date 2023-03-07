@@ -133,11 +133,11 @@ app.post("/editPrivatePageData", async (req, res) => {
     if (!snapshot.val()) {
       return;
     }
-
+    
     const databaseRef = db.ref("form_data/" + key);
     const backRes = snapshot.val();
 
-    if (req.body.approve === "true") {
+    if (approve) {
       databaseRef
         .update({
           name: backRes.name,
