@@ -1,5 +1,5 @@
 const formidable = require("formidable");
-const cors = require('cors')
+const cors = require("cors");
 const express = require("express");
 const app = express();
 var admin = require("firebase-admin");
@@ -83,20 +83,20 @@ app.post("/upload", async (req, res) => {
 
 // get all data of private page  from firebase
 app.get("/getPrivatePageData", async (req, res) => {
-  console.log('get api call');
+  console.log("get api call");
   const ref = db.ref("form_data");
   ref.once("value").then((snapshot) => {
     const data = snapshot.val();
     console.log("getAllData", data);
 
-    let privateDataArr=[]
-    
-    for(let key in data){
-       if(data[key]){
-           privateDataArr.push(data[key])
-       }
+    let privateDataArr = [];
+
+    for (let key in data) {
+      if (data[key]) {
+        privateDataArr.push(data[key]);
+      }
     }
-    return res.send({ ans:privateDataArr });
+    return res.send({ ans: privateDataArr });
   });
 });
 
@@ -133,7 +133,7 @@ app.post("/editPrivatePageData", async (req, res) => {
     if (!snapshot.val()) {
       return;
     }
-    
+
     const databaseRef = db.ref("form_data/" + key);
     const backRes = snapshot.val();
 
@@ -158,9 +158,7 @@ app.post("/editPrivatePageData", async (req, res) => {
         .catch((error) => {
           console.error("Error updating data:", error);
         });
-    }
-     else {
-      
+    } else {
       databaseRef
         .update({
           approve: false,
@@ -187,8 +185,6 @@ app.get("/allCardsData", async (req, res) => {
     const data = snapshot.val();
     console.log("allData191", data);
     let arr = [];
-
-    console.log("arr", arr);
 
     for (let key in data) {
       if (data[key].approve === true) {
@@ -256,17 +252,48 @@ app.get("/getCareerData", async (req, res) => {
   ref.once("value").then((snapshot) => {
     const data = snapshot.val();
     console.log("CareerData", data);
-    let responseArr=[]
-    
-    for(let key in data){
-       if(data[key]){
-           responseArr.push(data[key])
-       }
+    let responseArr = [];
+
+    for (let key in data) {
+      if (data[key]) {
+        responseArr.push(data[key]);
+      }
     }
     return res.send({ ans: responseArr });
   });
 });
 
-app.listen(4040, () => {
-  console.log("Server listening on port 6000.");
+app.post("/addContestInfo", async (req, res) => {
+  let { email, name, passoutYear, branch, phoneNumber } = req.body;
+  console.log("name274", name, passoutYear, branch, phoneNumber);
+
+  const emailId = email ? email.replace(/[^\w\s]/gi, "") : "";
+
+  const contestDataRef = db.ref(`contest_Data/${emailId}`);
+
+  const contestData = {
+    name: name || "",
+    branch: branch || "",
+    email: email || "",
+    passoutYear: passoutYear.toString() || "",
+    phoneNumber: phoneNumber.toString() || "",
+  };
+
+  contestDataRef
+    .set(contestData)
+    .then(() => {
+      console.log("contest data submittted succesfully");
+      return res.send({ message: "contest data submit successfully" });
+    })
+    .catch((err) => {
+      console.log("err", err);
+      return res.send({ message: "something went wrong" });
+    });
+
+  return res.send({ message: "success" });
+});
+const port = process.env.PORT || 4040;
+
+app.listen(port, () => {
+  console.log(`server listesting on ${port}`);
 });
