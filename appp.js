@@ -263,6 +263,7 @@ app.get("/getCareerData", async (req, res) => {
   });
 });
 
+//  add contest data
 app.post("/addContestInfo", async (req, res) => {
   let { email, name, passoutYear, branch, phoneNumber } = req.body;
   console.log("name274", name, passoutYear, branch, phoneNumber);
