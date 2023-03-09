@@ -74,7 +74,7 @@ app.post("/upload", async (req, res) => {
         res.send({ message: "bad request" });
       });
 
-    res.send({ message: "success", data: response });
+    res.send({ message: "success", data: JSON.parse( JSON.stringify(response ) ) });
     return;
 
     res.send("File uploaded successfully.");
@@ -96,7 +96,7 @@ app.get("/getPrivatePageData", async (req, res) => {
         privateDataArr.push(data[key]);
       }
     }
-    return res.send({ ans: privateDataArr });
+    return res.send({ ans: JSON.parse( JSON.stringify(privateDataArr ) ) });
   });
 });
 
@@ -110,7 +110,7 @@ app.get("/getData", async (req, res) => {
   const ref = db.ref("form_data");
   ref.child(key).on("value", function (snapshot) {
     console.log("value", snapshot.val());
-    return res.send({ data: snapshot.val() });
+    return res.send({ data: JSON.parse( JSON.stringify(snapshot.val() ) ) });
   });
 });
 
@@ -134,7 +134,8 @@ app.post("/editPrivatePageData", async (req, res) => {
       return;
     }
 
-    const databaseRef = db.ref("form_data/" + key);
+    const databaseRef = db.ref(`form_data/${key}`);
+
     const backRes = snapshot.val();
 
     if (approve) {
@@ -193,7 +194,7 @@ app.get("/allCardsData", async (req, res) => {
       }
     }
 
-    return res.send({ ans: arr });
+    return res.send({ ans: JSON.parse( JSON.stringify(arr ) ) });
   });
 });
 
@@ -259,7 +260,8 @@ app.get("/getCareerData", async (req, res) => {
         responseArr.push(data[key]);
       }
     }
-    return res.send({ ans: responseArr });
+    
+    return res.send({ ans:JSON.parse( JSON.stringify(responseArr ) )});
   });
 });
 
@@ -293,8 +295,12 @@ app.post("/addContestInfo", async (req, res) => {
 
   return res.send({ message: "success" });
 });
-const port = process.env.PORT || 4040;
 
-app.listen(port, () => {
-  console.log(`server listesting on ${port}`);
+
+// const port = process.env.PORT || 4040;
+
+app.listen(4040, () => {
+  console.log(`server listesting on ${4040}`);
 });
+
+module.exports = app;
