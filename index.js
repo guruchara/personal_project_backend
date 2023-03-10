@@ -4,20 +4,24 @@ const express = require("express");
 const app = express();
 var admin = require("firebase-admin");
 
-var serviceAccount = require("./prod.json");
 app.use(cors());
 
-// guru prod db json personal accout
-// var serviceAccount = require("./guruProd.json");
+// guru prod db json  main personal accout
+var serviceAccount = require("./guruProd.json");
+
+// temo db service account local
+// var serviceAccount = require("./prod.json");
+
 const imgbbUploader = require("imgbb-uploader");
 const bodyParser = require("body-parser");
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://websitedata-9cdbf-default-rtdb.firebaseio.com/",
+  // temp db Url local
+  // databaseURL: "https://websitedata-9cdbf-default-rtdb.firebaseio.com/",
 
-  //guru prod db url
-  // databaseURL:"https://websiteguru-5ab2b-default-rtdb.firebaseio.com/"
+  //guru prod db url main url personal mail gurucharanchouhan7@gmail.com
+  databaseURL:"https://websiteguru-5ab2b-default-rtdb.firebaseio.com/"
 });
 
 const db = admin.database();
