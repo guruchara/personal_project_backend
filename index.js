@@ -9,7 +9,7 @@ app.use(cors());
 // guru prod db json  main personal accout
 var serviceAccount = require("./guruProd.json");
 
-// temo db service account local
+// temp db service account local
 // var serviceAccount = require("./prod.json");
 
 const imgbbUploader = require("imgbb-uploader");
@@ -28,7 +28,7 @@ const db = admin.database();
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// set add user data in firebase
+// set add user data in firebase add user in firebase db 
 app.post("/upload", async (req, res) => {
   const form = formidable({ multiples: true });
 
@@ -39,7 +39,7 @@ app.post("/upload", async (req, res) => {
       return;
     }
 
-    let { name, email, companyName, linkedinUrl, batchYear, url } = fields;
+    let { name, email, companyName='', linkedinUrl='', batchYear='', url=''} = fields;
 
     console.log("email20", email);
     const file = files.photo;
@@ -56,6 +56,9 @@ app.post("/upload", async (req, res) => {
     const emailId = email ? email.replace(/[^\w\s]/gi, "") : "";
     const formDataRef = db.ref(`form_data/${emailId}`);
 
+    if(!emailId){
+     return res.send({message:'email not found '})
+    }
     const formData = {
       name: name,
       email: email,
