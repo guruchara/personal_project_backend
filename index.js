@@ -279,6 +279,9 @@ app.post("/addContestInfo", async (req, res) => {
 
   const emailId = email ? email.replace(/[^\w\s]/gi, "") : "";
 
+  if(!email){
+    return res.send({message:'failed mail not found'})
+  }
   const contestDataRef = db.ref(`contest_Data/${emailId}`);
 
   const contestData = {
@@ -306,8 +309,8 @@ app.post("/addContestInfo", async (req, res) => {
 
 // const port = process.env.PORT || 4040;
 
-app.listen(4040, () => {
-  console.log(`server listesting on ${4040}`);
+app.listen(4041, () => {
+  console.log(`server listesting on ${4041}`);
 });
 
 module.exports = app;
