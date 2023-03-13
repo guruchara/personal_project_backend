@@ -4,6 +4,7 @@ const express = require("express");
 const app = express();
 var admin = require("firebase-admin");
 
+var nodemailer = require('nodemailer');
 app.use(cors());
 
 // guru prod db json  main personal accout
@@ -272,7 +273,7 @@ app.get("/getCareerData", async (req, res) => {
   });
 });
 
-//  add contest data
+//  add contest registration data
 app.post("/addContestInfo", async (req, res) => {
   let { email, name, passoutYear, branch, phoneNumber } = req.body;
   console.log("name274", name, passoutYear, branch, phoneNumber);
@@ -306,6 +307,51 @@ app.post("/addContestInfo", async (req, res) => {
   return res.send({ message: "success" });
 });
 
+
+app.post('/sendContestMail',async(req,res)=>{
+
+
+  const ref = db.ref("contest_Data");
+  ref.once("value").then((snapshot) => {
+    const data = snapshot.val();
+    console.log("allData316", data);
+
+    // let emailArr = ['gurucharanchouhan7@gmail.com','gurucharanchouhan17@gmail.com']
+    // let emailArr=['toloxely@lyft.live','xotifec191@luxeic.com']
+    for (let key in data) {
+      if (data[key]) {
+        emailArr.push(data[key].email);
+      }
+    }
+
+    var transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: 'gurucharan.chouhan@zunpulse.com',
+        pass: 'cczkxzbwewgrbmxz'
+      }
+    });
+    
+    for(let i=0;i<emailArr.length;i++){
+      var mailOptions = {
+        from: 'gurucharan.chouhan@zunpulse.com',
+        to:emailArr[i],
+        subject: 'Hello I am Guru I send this mail by using nodejs',
+        text: 'Ooh That was easy!  :) successfully mail sent:) \n https://www.zunpulse.com/'
+      };
+
+      transporter.sendMail(mailOptions, function(error, info){
+        if (error) {
+          console.log(error);
+        } else {
+          console.log('Email sent: ' + info.response);
+        }
+      });
+    }
+
+    return res.send({data:emailArr});
+
+})})
 
 // const port = process.env.PORT || 4040;
 
