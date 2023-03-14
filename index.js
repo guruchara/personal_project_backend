@@ -322,13 +322,16 @@ app.post("/sendContestMail", async (req, res) => {
   ref.once("value").then((snapshot) => {
     const data = snapshot.val();
     console.log("allData316", data);
-    // return res.send({message:'failed'})
+   
+    let arr = Object.keys(data);
 
-    let emailArr=[]
-    for (let key in data) {
-      if (data[key]) {
-        emailArr.push(data[key].email);
-      }
+    let emailArr = [];
+
+    for (let i = 0; i < arr.length; i++) {
+      emailArr.push({
+        name: data[arr[i]].name,
+        email: data[arr[i]].email,
+      });
     }
 
     var transporter = nodemailer.createTransport({
@@ -343,9 +346,9 @@ app.post("/sendContestMail", async (req, res) => {
     for (let i = 0; i < emailArr.length; i++) {
       var mailOptions = {
         from: "gurucharan.chouhan@zunpulse.com",
-        to: emailArr[i],
+        to: emailArr[i].email,
         subject: "Contest Link ",
-        html: `<h3 style="color:gray; font-family:sans-serif">Thankyou for participate in Coding Event</h3> <p style="font-family:sans-serif;font-size:12px; margin:0px">Start Coding Test by using below link</p><p style="font-family:sans-serif; font-size:14px; margin:0px">Link =) ${contestLink}</p> 
+        html: `<h3 style="color:gray; font-family:sans-serif">Thankyou for participate in Coding Event</h3><p>Hey , ${emailArr[i].name}</p> <p style="font-family:sans-serif;font-size:12px; margin:0px">Start Coding Test by using below link</p><p style="font-family:sans-serif; font-size:14px; margin:0px">Link =) ${contestLink}</p> 
        <p> -------------------------------------------------------</p>
         <p style="font-family:sans-serif">All the Best :)<br style="font-family:sans-serif; font-size:14px">Regards</br><br><b style="font-family:sans-serif">JitCoder's_Comm.</b><br></p>
        <p>-------------------------------------------------------</p>`,
