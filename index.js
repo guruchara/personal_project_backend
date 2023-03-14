@@ -318,6 +318,11 @@ app.post("/addContestInfo", async (req, res) => {
 });
 
 app.post("/sendContestMail", async (req, res) => {
+
+  let contestLink=req.body.contestUrl || ''
+  if(!contestLink){
+    return res.send({message:' please check link found empty :('})
+  }
   const ref = db.ref("contest_Data");
   ref.once("value").then((snapshot) => {
     const data = snapshot.val();
@@ -341,7 +346,6 @@ app.post("/sendContestMail", async (req, res) => {
         pass: "cczkxzbwewgrbmxz",
       },
     });
-    let contestLink = "https://www.zunroof.com/";
 
     for (let i = 0; i < emailArr.length; i++) {
       var mailOptions = {
@@ -363,7 +367,7 @@ app.post("/sendContestMail", async (req, res) => {
       });
     }
 
-    return res.send({ data: emailArr });
+    return res.send({ data: emailArr.length});
   });
 });
 
