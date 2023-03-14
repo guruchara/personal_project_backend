@@ -4,7 +4,7 @@ const express = require("express");
 const app = express();
 var admin = require("firebase-admin");
 
-var nodemailer = require('nodemailer');
+var nodemailer = require("nodemailer");
 app.use(cors());
 
 // guru prod db json  main personal accout
@@ -29,7 +29,7 @@ const db = admin.database();
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// set add user data in firebase add user in firebase db 
+// set add user data in firebase add user in firebase db
 app.post("/upload", async (req, res) => {
   const form = formidable({ multiples: true });
 
@@ -40,7 +40,14 @@ app.post("/upload", async (req, res) => {
       return;
     }
 
-    let { name, email, companyName='', linkedinUrl='', batchYear='', url=''} = fields;
+    let {
+      name,
+      email,
+      companyName = "",
+      linkedinUrl = "",
+      batchYear = "",
+      url = "",
+    } = fields;
 
     console.log("email20", email);
     const file = files.photo;
@@ -57,8 +64,8 @@ app.post("/upload", async (req, res) => {
     const emailId = email ? email.replace(/[^\w\s]/gi, "") : "";
     const formDataRef = db.ref(`form_data/${emailId}`);
 
-    if(!emailId){
-     return res.send({message:'email not found '})
+    if (!emailId) {
+      return res.send({ message: "email not found " });
     }
     const formData = {
       name: name,
@@ -82,7 +89,10 @@ app.post("/upload", async (req, res) => {
         res.send({ message: "bad request" });
       });
 
-    res.send({ message: "success", data: JSON.parse( JSON.stringify(response ) ) });
+    res.send({
+      message: "success",
+      data: JSON.parse(JSON.stringify(response)),
+    });
     return;
 
     res.send("File uploaded successfully.");
@@ -104,7 +114,7 @@ app.get("/getPrivatePageData", async (req, res) => {
         privateDataArr.push(data[key]);
       }
     }
-    return res.send({ ans: JSON.parse( JSON.stringify(privateDataArr ) ) });
+    return res.send({ ans: JSON.parse(JSON.stringify(privateDataArr)) });
   });
 });
 
@@ -118,7 +128,7 @@ app.get("/getData", async (req, res) => {
   const ref = db.ref("form_data");
   ref.child(key).on("value", function (snapshot) {
     console.log("value", snapshot.val());
-    return res.send({ data: JSON.parse( JSON.stringify(snapshot.val() ) ) });
+    return res.send({ data: JSON.parse(JSON.stringify(snapshot.val())) });
   });
 });
 
@@ -202,7 +212,7 @@ app.get("/allCardsData", async (req, res) => {
       }
     }
 
-    return res.send({ ans: JSON.parse( JSON.stringify(arr ) ) });
+    return res.send({ ans: JSON.parse(JSON.stringify(arr)) });
   });
 });
 
@@ -268,8 +278,8 @@ app.get("/getCareerData", async (req, res) => {
         responseArr.push(data[key]);
       }
     }
-    
-    return res.send({ ans:JSON.parse( JSON.stringify(responseArr ) )});
+
+    return res.send({ ans: JSON.parse(JSON.stringify(responseArr)) });
   });
 });
 
@@ -280,8 +290,8 @@ app.post("/addContestInfo", async (req, res) => {
 
   const emailId = email ? email.replace(/[^\w\s]/gi, "") : "";
 
-  if(!email){
-    return res.send({message:'failed mail not found'})
+  if (!email) {
+    return res.send({ message: "failed mail not found" });
   }
   const contestDataRef = db.ref(`contest_Data/${emailId}`);
 
@@ -307,17 +317,14 @@ app.post("/addContestInfo", async (req, res) => {
   return res.send({ message: "success" });
 });
 
-
-app.post('/sendContestMail',async(req,res)=>{
-
-
+app.post("/sendContestMail", async (req, res) => {
   const ref = db.ref("contest_Data");
   ref.once("value").then((snapshot) => {
     const data = snapshot.val();
     console.log("allData316", data);
+    // return res.send({message:'failed'})
 
-    // let emailArr = ['gurucharanchouhan7@gmail.com','gurucharanchouhan17@gmail.com']
-    // let emailArr=['toloxely@lyft.live','xotifec191@luxeic.com']
+    let emailArr=[]
     for (let key in data) {
       if (data[key]) {
         emailArr.push(data[key].email);
@@ -325,33 +332,37 @@ app.post('/sendContestMail',async(req,res)=>{
     }
 
     var transporter = nodemailer.createTransport({
-      service: 'gmail',
+      service: "gmail",
       auth: {
-        user: 'gurucharan.chouhan@zunpulse.com',
-        pass: 'cczkxzbwewgrbmxz'
-      }
+        user: "gurucharan.chouhan@zunpulse.com",
+        pass: "cczkxzbwewgrbmxz",
+      },
     });
-    
-    for(let i=0;i<emailArr.length;i++){
+    let contestLink = "https://www.zunroof.com/";
+
+    for (let i = 0; i < emailArr.length; i++) {
       var mailOptions = {
-        from: 'gurucharan.chouhan@zunpulse.com',
-        to:emailArr[i],
-        subject: 'Hello I am Guru I send this mail by using nodejs',
-        text: 'Ooh That was easy!  :) successfully mail sent:) \n https://www.zunpulse.com/'
+        from: "gurucharan.chouhan@zunpulse.com",
+        to: emailArr[i],
+        subject: "Contest Link ",
+        html: `<h3 style="color:gray; font-family:sans-serif">Thankyou for participate in Coding Event</h3> <p style="font-family:sans-serif;font-size:12px; margin:0px">Start Coding Test by using below link</p><p style="font-family:sans-serif; font-size:14px; margin:0px">Link =) ${contestLink}</p> 
+       <p> -------------------------------------------------------</p>
+        <p style="font-family:sans-serif">All the Best :)<br style="font-family:sans-serif; font-size:14px">Regards</br><br><b style="font-family:sans-serif">JitCoder's_Comm.</b><br></p>
+       <p>-------------------------------------------------------</p>`,
       };
 
-      transporter.sendMail(mailOptions, function(error, info){
+      transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
           console.log(error);
         } else {
-          console.log('Email sent: ' + info.response);
+          console.log("Email sent: " + info.response);
         }
       });
     }
 
-    return res.send({data:emailArr});
-
-})})
+    return res.send({ data: emailArr });
+  });
+});
 
 // const port = process.env.PORT || 4040;
 
