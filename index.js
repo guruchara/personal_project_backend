@@ -371,7 +371,7 @@ app.post("/sendContestMail", async (req, res) => {
   });
 });
 
-app.use("/setFeedback", async (req, res) => {
+app.post("/setFeedback", async (req, res) => {
   const { name, email, feedback, starCount } = req.body;
 
   console.log("name", name, email, feedback, starCount);
@@ -402,6 +402,25 @@ app.use("/setFeedback", async (req, res) => {
       return res.send({ message: "something went wrong" });
     });
 });
+
+app.get('/getFeedbackData',async(req,res)=>{
+
+  const ref = db.ref("feedback_data");
+  ref.once("value").then((snapshot) => {
+    const data = snapshot.val();
+
+    let feedbackDataArr = [];
+
+    for (let key in data) {
+      if (data[key]) {
+        feedbackDataArr.push(data[key]);
+      }
+    }
+    return res.send({ ans:feedbackDataArr});
+  });
+
+})
+
 // const port = process.env.PORT || 4040;
 
 app.listen(4041, () => {
