@@ -371,6 +371,37 @@ app.post("/sendContestMail", async (req, res) => {
   });
 });
 
+app.use("/setFeedback", async (req, res) => {
+  const { name, email, feedback, starCount } = req.body;
+
+  console.log("name", name, email, feedback, starCount);
+
+  const emailId = email ? email.replace(/[^\w\s]/gi, "") : "";
+
+  if (!email) {
+    return res.send({ message: "failed mail not found" });
+  }
+
+  const feedbackDataRef = db.ref(`feedback_data/${emailId}`);
+
+  const feedbackData = {
+    name: name || "",
+    email: email || "",
+    feedback:feedback || '',
+    starCount:starCount || 0
+  };
+
+  feedbackDataRef
+    .set(feedbackData)
+    .then(() => {
+      console.log(" feedback submittted succesfully");
+      return res.send({ message: "feedback data submit successfully" });
+    })
+    .catch((err) => {
+      console.log("err", err);
+      return res.send({ message: "something went wrong" });
+    });
+});
 // const port = process.env.PORT || 4040;
 
 app.listen(4041, () => {
