@@ -417,6 +417,12 @@ app.get('/getFeedbackData',async(req,res)=>{
         feedbackDataArr.push(data[key]);
       }
     }
+
+    // sort data on the basis of feedback Date
+    feedbackDataArr.sort(function(a,b){
+      return new Date(b.feedbackDate) - new Date(a.feedbackDate);
+    });
+
     return res.send({ ans:feedbackDataArr});
   });
 
