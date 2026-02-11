@@ -3,7 +3,6 @@ const cors = require("cors");
 const express = require("express");
 const app = express();
 var admin = require("firebase-admin");
-
 var nodemailer = require("nodemailer");
 app.use(cors());
 
@@ -212,7 +211,8 @@ app.get("/allCardsData", async (req, res) => {
       }
     }
 
-    return res.send({ ans: JSON.parse(JSON.stringify(arr)) });
+    arr.sort((a, b) => a.batchYear < b.batchYear ? 1 : -1);
+    return res.send({ ans: JSON.parse(JSON.stringify(arr))});
   });
 });
 
@@ -418,15 +418,76 @@ app.get('/getFeedbackData',async(req,res)=>{
       }
     }
 
-    // sort data on the basis of feedback Date
+    // sort data on the basis of star
     feedbackDataArr.sort(function(a,b){
-      return new Date(b.feedbackDate) - new Date(a.feedbackDate);
+      return new Date(b.starCount) - new Date(a.starCount);
     });
 
     return res.send({ ans:feedbackDataArr});
   });
 
 })
+
+//  uploading vihangam data 
+app.post('/setVihangamData',async(req,res)=>{
+    
+      const vihangamForm=formidable({multiples:true})
+      vihangamForm.parse(req,async(err,fields,files)=>{
+
+           if(err){
+              console.log('err439',err)
+              res.status(500).send("Error parsing formData")
+              return
+           }
+
+           let {
+             name,
+             email,
+           }=fields;
+
+           const file=files.photo;
+           let response={}
+
+           try{
+
+            response=await imgbbUploader(
+              "cbd44dd9b4da93cee7cea6b1c15ada92",
+              file.filepath
+            );
+           }
+           catch(err){
+              console.log("error",err)
+           }
+
+           const emailId = email ? email.replace(/[^\w\s]/gi, "") : "";
+           const vihangamDataRef = db.ref(`vihangam_data/${emailId}`);
+
+           if(!emailId){
+              return res.send({message:"email not found "})
+           }
+
+           const vihangamData={
+               name:name,
+               email:email,
+               updated:Date.now(),
+               imageUrl:response.url || ""
+           }
+          console.log("vihangamData476",vihangamData)
+           vihangamDataRef.set(vihangamData).then(()=>{
+              console.log("form Data Saved Succesfully")
+           }).catch((err)=>{
+               console.error("error while set the vihangam data")
+               return res.send({message:'some thing went wrong check kro'})
+           })
+
+           return res.send({
+            message:'success',
+            data:JSON.parse(JSON.stringify(response))
+           });
+           return 
+      });
+});  // end here the vihangam data
+
 
 // const port = process.env.PORT || 4040;
 
