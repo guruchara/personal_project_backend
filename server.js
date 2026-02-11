@@ -3,10 +3,9 @@ const express = require('express')
 const cors = require('cors')
 const path = require('path');
 const nodemailer = require('nodemailer')
-
+// controller and resolver all in single only 
 const mongoose = require('mongoose')
 const app = express();
-
 mongoose.connect('mongodb://127.0.0.1/userInfo')
     .then(() => console.log("Db Connected")).catch(err => console.log("error", err))
 
